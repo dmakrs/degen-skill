@@ -155,6 +155,18 @@ const RECIPES = {
   alarm: () => ({ dur: 0.9, graph:
     `${src(`(gt(sin(2*PI*(880-220*gt(mod(t,0.3),0.15))*t),0)*2-1)*0.5*${sw('t/0.9')}`, 0.9)},lowpass=f=3000[m]` }),
 
+  // ── футбол: трибуны, рёв на гол, свисток
+  // crowd: гул стадиона на c.len с — шум, низкие частоты, медленные «волны» речёвок
+  crowd: c => ({ dur: c.len, graph:
+    `${src(`${N0}*(0.7+0.3*sin(2*PI*0.4*t)*sin(2*PI*0.13*t+1))`, c.len)},lowpass=f=1300,highpass=f=150,aecho=0.8:0.6:40|70:0.4|0.3[m]` }),
+  // roar: рёв трибун на гол — резкая атака, долгий хвост
+  roar: c => ({ dur: c.dur ?? 2.4, graph:
+    `${src(`${N0}*min(1,t/0.12)*exp(-t*${(1.6 / ((c.dur ?? 2.4) / 2.4)).toFixed(3)})*(1+0.15*sin(2*PI*5*t))`, c.dur ?? 2.4)},bandpass=f=900:width_type=h:w=1600,aecho=0.8:0.5:50|90:0.4|0.25[m]` }),
+  // whistle: судейский свисток с трелью; c.blasts — [длительность, пауза]… (финальный — три)
+  whistle: c => { const B = c.blasts || [[0.5, 0]]; let t0 = 0; const terms = [];
+    for (const [d, gap] of B) { terms.push(`between(t,${t0.toFixed(3)},${(t0 + d).toFixed(3)})*min(1,(t-${t0.toFixed(3)})/0.01)`); t0 += d + gap; }
+    return { dur: t0 + 0.05, graph: `${src(`(${terms.join('+')})*sin(2*PI*2900*t+3*sin(2*PI*32*t))*(0.8+0.2*sin(2*PI*32*t))`, t0 + 0.05)},highpass=f=1500[m]` }; },
+
   // slide-whistle up, "shock" sting
   slideWhistle: () => ({ dur: 0.2, graph:
     `${src(`min(1,t/0.006)*(sin(${sweepPhase(850, 2900, 0.15, 't')}+0.5*sin(2*PI*26*t))+0.15*sin(3*${sweepPhase(850, 2900, 0.15, 't')}))`, 0.2)}[m]` }),

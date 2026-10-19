@@ -12,6 +12,8 @@
 //     press:   [t, …],                           // кнопка Buy вдавлена 0.15 с
 //     pos:     { show:[[a,b]], pnl:[{ t, v, dur? }] },    // плашка позиции: сторона/цена входа/сумма + PnL
 //     resolve: { t, outcome:'YES'|'NO' },        // штамп «RESOLVED · YES» (pop) — дальше рынок закрыт
+//     alert:   [[a,b]],                         // красная тревога: пульсирующая рамка
+//     iconBg, iconFg,                           // цвета иконки рынка (по умолчанию оранжевая ₿)
 //     rows:    [{ name, p }],                    // (опц.) список исходов вместо графика, как в карточках DOXA
 //     cursor:  [{ t, v:[x,y], dur? }], clicks:[t, …],
 //   }
@@ -60,7 +62,7 @@ const mkOwlLogo = (x, y, s) => `<g transform="translate(${x},${y}) scale(${s})">
   const title = (M.title || 'Bitcoin to $200k by 2026?');
   const words = title.split(' '), lines = ['']; for (const w of words) { if ((lines[lines.length - 1] + ' ' + w).trim().length > 20) lines.push(w); else lines[lines.length - 1] = (lines[lines.length - 1] + ' ' + w).trim(); }
   const card = `<rect x="20" y="186" width="680" height="1074" rx="18" fill="${MK.panel}" stroke="${MK.line}" stroke-width="2"/>
-    <rect x="44" y="212" width="88" height="88" rx="14" fill="#f7931a"/><text x="88" y="274" text-anchor="middle" ${mkFont(56, 900)} fill="#fff">${M.icon || '₿'}</text>
+    <rect x="44" y="212" width="88" height="88" rx="14" fill="${M.iconBg || '#f7931a'}"/><text x="88" y="274" text-anchor="middle" ${mkFont(56, 900)} fill="${M.iconFg || '#fff'}">${M.icon || '₿'}</text>
     ${lines.map((l, i) => `<text x="152" y="${246 + i * 40}" ${mkFont(34, 700)} fill="${MK.text}">${l}</text>`).join('')}
     <text x="676" y="232" text-anchor="end" ${mkFont(18, 500)} fill="${MK.dim}">Ends ${M.ends || "Dec 31, '26"}</text>
     <text x="44" y="370" ${mkFont(64, 900)} fill="${MK.yes}">${yesC}%</text>
@@ -125,6 +127,9 @@ const mkOwlLogo = (x, y, s) => `<g transform="translate(${x},${y}) scale(${s})">
         <text x="0" y="-12" text-anchor="middle" ${mkFont(40, 800)} fill="${col}" letter-spacing="6">RESOLVED</text>
         <text x="0" y="54" text-anchor="middle" ${mkFont(76, 900)} fill="${col}">${res.outcome}</text></g>`;
   }
+  // тревога: красная пульсирующая рамка и подложка в окнах alert
+  const alert = M.alert && inWin(M.alert, t) ? `<rect x="6" y="6" width="708" height="1268" rx="20" fill="none" stroke="${MK.no}" stroke-width="12" opacity="${(.5 + .5 * Math.abs(Math.sin(t * 9))).toFixed(2)}"/>
+    <rect width="720" height="1280" fill="${MK.no}" opacity="${(.06 + .06 * Math.abs(Math.sin(t * 9))).toFixed(3)}"/>` : '';
   return `<svg viewBox="0 0 720 1280" width="720" height="1280" xmlns="http://www.w3.org/2000/svg">
-    <rect width="720" height="1280" fill="${MK.bg}"/>${head}${card}${chart}${order}${pos}${stamp}${termCursor(M, t)}</svg>`;
+    <rect width="720" height="1280" fill="${MK.bg}"/>${head}${card}${chart}${order}${pos}${stamp}${alert}${termCursor(M, t)}</svg>`;
 };

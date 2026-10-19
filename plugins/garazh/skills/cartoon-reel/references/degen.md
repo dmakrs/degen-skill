@@ -28,6 +28,7 @@ markets: { btc: { cat, title, ends, icon, vol,
   pos: { show:[[a,b]], entry:'12¢', pnl:[{ t, v, dur? }] },
   resolve: { t, outcome:'YES'|'NO' },    // штамп RESOLVED
   rows: [{ name, p }],                   // (опц.) список исходов вместо графика
+  alert: [[a,b]], iconBg, iconFg,        // красная тревога; цвета иконки
   cursor: [{ t, v:[x,y], dur? }], clicks: [t] } },
 shots: [{ set: 'market', market: 'btc', … }]
 ```
@@ -36,14 +37,16 @@ shots: [{ set: 'market', market: 'btc', … }]
 
 ## 4. Локации (`set: 'stage'`, shot.back / shot.front)
 `roomBack/roomFront` — тёплая ночная квартира (торшер, растения, окно на город, монитор слева; `env.glow: 'yellow'|'green'|'red'`, `env.mess: 1` — бумажки), `yachtBack` — палуба на закате, `clubBack` (`env.flash`), `roofBack` (билборд DOXA), `moonBack` («to the moon»), `moneyFront` — пачки денег + дождь купюр (`env.rain`). `set: 'paw'` — лапа на мышке, клики `events.clicks`.
+`sofaBack/sofaFront` — сова на диване смотрит ТВ (свет экрана спереди `env.tv`, вспышка `env.tvflash`, подушка с «D» `env.pillow`, дождь купюр `env.rain`).
+`set: 'tv'` — ТВ-трансляция матча крупно: `TIMELINE.tv = { home, away, homeKit, awayKit, clock:[{t,v:сек}], ball:[{t,v:[u,w]}], goals:[{t,team}], final }` — счёт из голов, баннеры GOAL!/FULL TIME, табло «90+N'». Без логотипов клубов — только цвета формы. Пример: `episodes/clasico`.
 
 ## 5. Оверлеи и движок
-- `pnl: { show:[[a,b]], keys:[{ t, v, dur? }], y? }` — счётчик (dur — «накрутка»).
+- `pnl: { show:[[a,b]], keys:[{ t, v, dur?, flat? }], y? }` — счётчик (dur — «накрутка», flat — сумма без знака, жёлтым).
 - `events.shakes: [[t, px, dur?]]` — удары камеры.
 - `shot.cast: [{ who, x, y, s, rot }]` — `rot` поворачивает персонажа вокруг ног.
 
 ## 6. Звук
-Рецепты `sfx/build.mjs`: `kickLoop hatLoop clapLoop bassLoop` (лупы на `len` секунд, `bpm`, у баса `root`, `notes`), `cash` («ка-чинг»), `riser` (`align:'end'`, `dur`), `alarm`. Музыка стартует на дропе (резолв/монтаж) и обрывается на склейке в реальность — тишина перед панчем.
+Рецепты `sfx/build.mjs`: `kickLoop hatLoop clapLoop bassLoop` (лупы на `len` секунд, `bpm`, у баса `root`, `notes`), `cash` («ка-чинг»), `riser` (`align:'end'`, `dur`), `alarm`, футбол: `crowd` (`len`), `roar` (`dur`), `whistle` (`blasts:[[d,gap]…]`). Музыка стартует на дропе (резолв/монтаж) и обрывается на склейке в реальность — тишина перед панчем.
 
 ## 7. Бренд
 Лексика: trade, predict, position, market, probability. Никогда: bet/betting/gamble/casino/ставка/wager. Реальные люди — только текстом вопроса рынка.

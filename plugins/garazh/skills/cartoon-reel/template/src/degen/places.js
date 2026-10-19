@@ -197,3 +197,135 @@ function moonBack(t, env) {
     ${down ? `<g transform="translate(300,330)"><path d="M-60,-30 L-90,-60 M0,-50 L0,-90 M60,-30 L90,-60" stroke="#fff" stroke-width="8" stroke-linecap="round"/></g>` : ''}
   </svg>`;
 };
+
+// ── гостиная: сова на диване смотрит ТВ (ТВ — за камерой, его свет падает на сову спереди)
+//   env.tv — цвет свечения экрана (по умолчанию зелёное поле), env.tvflash 0..1 — вспышка (гол), env.pillow 1 — подушка в лапах,
+//   env.rain 0..1 — дождь купюр поверх (победа)
+function sofaBack(t, env) {
+  return `<defs><radialGradient id="sfLamp" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffb84d" stop-opacity=".55"/><stop offset="1" stop-color="#ffb84d" stop-opacity="0"/></radialGradient>
+      <linearGradient id="sfWall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c1815"/><stop offset="1" stop-color="#2c251f"/></linearGradient></defs>
+    <rect x="-400" y="-200" width="1520" height="1600" fill="url(#sfWall)"/>
+    ${[...Array(16)].map((_, i) => `<path d="M${-400 + i * 100},-200 V1300" stroke="#241e18" stroke-width="6"/>`).join('')}
+    <rect x="10" y="120" width="230" height="400" fill="#0f1a33" stroke="#120e0b" stroke-width="12"/>
+    ${[...Array(10)].map((_, i) => `<rect x="${24 + i * 22}" y="${280 + (i * 37 % 110)}" width="18" height="${240 - (i * 37 % 110)}" fill="#1a2747"/>`).join('')}
+    ${[...Array(26)].map((_, i) => `<rect x="${30 + (i * 53 % 200)}" y="${310 + (i * 71 % 210)}" width="5" height="7" fill="#f6c445" opacity="${(.5 + .5 * Math.abs(Math.sin(t + i))).toFixed(2)}"/>`).join('')}
+    <path d="M125,120 V520" stroke="#120e0b" stroke-width="8"/>
+    <!-- картина и торшер -->
+    <rect x="-300" y="160" width="240" height="160" fill="#3b2f26" stroke="${PL.ink}" stroke-width="6"/><path d="M-280,300 L-210,220 L-160,270 L-120,230 L-80,300 Z" fill="#6b5a3a"/><circle cx="-110" cy="200" r="16" fill="#f6c445"/>
+    <circle cx="640" cy="480" r="300" fill="url(#sfLamp)"/>
+    <path d="M640,520 V1000" stroke="#1a140f" stroke-width="10"/><path d="M590,440 L690,440 L710,530 L570,530 Z" fill="#f2b45a" stroke="${PL.ink}" stroke-width="6"/>
+    ${plant(-200, 880, 1.4)}${plant(1000, 860, 1.1)}
+    <!-- спинка дивана -->
+    <path d="M-120,1000 L-120,780 C-120,730 -90,700 -40,700 L760,700 C810,700 840,730 840,780 L840,1000 Z" fill="#4a4c55" stroke="${PL.ink}" stroke-width="7"/>
+    <path d="M360,710 V990" stroke="#3b3d45" stroke-width="6"/>
+    <path d="M-110,760 C40,740 200,742 350,760 M370,760 C520,742 680,740 830,760" stroke="#5b5d68" stroke-width="10" fill="none" stroke-linecap="round"/>
+    <rect x="-90" y="730" width="170" height="150" rx="30" fill="#f6c445" stroke="${PL.ink}" stroke-width="6" transform="rotate(-10 0 800)"/>`;
+}
+function billRain(t, k, seed = 77) {
+  if (k <= 0) return '';
+  const rr = rng(seed); let fall = '';
+  for (let i = 0; i < 26; i++) {
+    const x0 = -300 + rr() * 1320, sp = 260 + rr() * 220, ph = rr() * 1600;
+    const y = ((t * sp + ph) % 1700) - 300, x = x0 + Math.sin(t * 2 + i) * 40;
+    fall += bill(x, y, Math.sin(t * 3 + i * 1.7) * 40, .8 + rr() * .4);
+  }
+  return `<g opacity="${clamp(k)}">${fall}</g>`;
+}
+function sofaFront(t, env) {
+  const tv = env.tv || '#7cd67a', fl = clamp(env.tvflash ?? 0), fk = .07 + .03 * Math.sin(t * 23) * Math.sin(t * 7.1);
+  const pillow = env.pillow ? `<g transform="rotate(-4 360 950)"><rect x="230" y="860" width="260" height="190" rx="46" fill="#e9b52c" stroke="${PL.ink}" stroke-width="7"/>
+      <text x="360" y="990" text-anchor="middle" font-family="Rubik" font-weight="900" font-size="90" fill="#a87d14">D</text></g>` : '';
+  return `${pillow}
+    <!-- сиденье и подлокотники -->
+    <path d="M-160,1000 L880,1000 L880,1300 L-160,1300 Z" fill="#555864" stroke="${PL.ink}" stroke-width="7"/>
+    <path d="M-150,1010 C40,990 300,992 350,1010 M370,1010 C420,992 680,990 870,1010" stroke="#676a77" stroke-width="10" fill="none" stroke-linecap="round"/>
+    <path d="M-260,860 C-260,820 -150,820 -140,860 L-140,1300 L-260,1300 Z M860,860 C870,820 980,820 980,860 L980,1300 L860,1300 Z" fill="#4a4c55" stroke="${PL.ink}" stroke-width="7"/>
+    <!-- журнальный столик: попкорн и пульт -->
+    <path d="M-60,1150 L780,1150 L760,1300 L-40,1300 Z" fill="#3a2a1e" stroke="${PL.ink}" stroke-width="7"/>
+    <path d="M440,1150 C440,1230 620,1230 620,1150 Z" fill="#1d1d1f" stroke="${PL.ink}" stroke-width="6"/>
+    ${[...Array(14)].map((_, i) => `<circle cx="${455 + (i * 37 % 150)}" cy="${1136 - (i % 3) * 10}" r="${13 + i % 3}" fill="#f7e2a0" stroke="#c9a85a" stroke-width="3"/>`).join('')}
+    <rect x="80" y="1170" width="130" height="34" rx="10" fill="#222" stroke="${PL.ink}" stroke-width="5"/><circle cx="110" cy="1187" r="6" fill="#e33"/>
+    ${billRain(t, env.rain ?? 0)}
+    <!-- свет экрана ТВ спереди + вспышка гола -->
+    <ellipse cx="360" cy="760" rx="420" ry="520" fill="${tv}" opacity="${fk.toFixed(3)}" style="mix-blend-mode:screen"/>
+    ${fl > .01 ? `<rect x="-400" y="-200" width="1520" height="1600" fill="#fff" opacity="${(fl * .5).toFixed(2)}"/>` : ''}`;
+}
+
+// ── ТВ-трансляция матча (set tv): ТВ крупно в тёмной гостиной, внутри — поле сверху-сбоку, игроки цветами формы, мяч, табло.
+// TIMELINE.tv = {
+//   home: 'RMA', away: 'FCB', homeKit: ['#f5f5f5','#e9b52c'], awayKit: ['#1d4fa3','#a3203a'] (полосы),
+//   clock: [{ t, v: секунды матча, dur? }]            // табло: «72:18», после 90:00 — «90+N'»
+//   ball:  [{ t, v: [u, w], dur? }]                    // мяч в координатах поля 0..1 (u — слева направо, w — сверху вниз)
+//   goals: [{ t, team: 'home'|'away' }]                // счёт = число голов до t; баннер GOAL!, вспышка, сетка дёргается
+//   final: t                                           // баннер FULL TIME
+// }
+// Хозяева атакуют вправо, гости — влево. Ворота: u = 0 и u = 1, w = .5.
+(window.SETS = window.SETS || {}).tv = (t, shot) => {
+  const V = TIMELINE.tv || {}, X0 = 24, Y0 = 336, Wd = 672, Ht = 378;
+  const hk = V.homeKit || ['#f5f5f5', '#e9b52c'], ak = V.awayKit || ['#1d4fa3', '#a3203a'];
+  const goals = (V.goals || []).filter(g => t >= g.t), sh = goals.filter(g => g.team === 'home').length, sa = goals.length - sh;
+  const lastG = goals.length ? goals[goals.length - 1] : null, gk = lastG ? prog(t, lastG.t, lastG.t + 1.6) : 1;
+  const sec = Math.floor(trackAt(V.clock || [{ t: 0, v: 72 * 60 + 18 }], t));
+  const clock = sec >= 5400 ? `90+${Math.floor((sec - 5400) / 60) + 1}'` : `${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
+  const [bu, bw] = trackAt(V.ball || [{ t: 0, v: [.5, .5] }], t);
+  // поле: перспектива — верх уже низа
+  const P = (u, w) => { const yy = Y0 + 70 + w * (Ht - 80), sq = .78 + .22 * w; return [X0 + Wd / 2 + (u - .5) * Wd * sq, yy]; };
+  const line = pts => 'M' + pts.map(p => P(...p).map(n => n.toFixed(1)).join(',')).join(' L');
+  const stripes = [...Array(10)].map((_, i) => `<path d="${line([[i / 10, 0], [(i + 1) / 10, 0], [(i + 1) / 10, 1], [i / 10, 1]])} Z" fill="${i % 2 ? '#3f9a45' : '#47a84d'}"/>`).join('');
+  const marks = `<path d="${line([[0, 0], [1, 0], [1, 1], [0, 1]])} Z M${P(.5, 0).join(',')} L${P(.5, 1).join(',')}
+    ${line([[0, .22], [.16, .22], [.16, .78], [0, .78]])} ${line([[1, .22], [.84, .22], [.84, .78], [1, .78]])}" stroke="#e9f5e6" stroke-width="3" fill="none" opacity=".85"/>
+    <ellipse cx="${P(.5, .5)[0]}" cy="${P(.5, .5)[1]}" rx="${Wd * .11}" ry="${Ht * .11}" stroke="#e9f5e6" stroke-width="3" fill="none" opacity=".85"/>`;
+  const netShake = side => lastG && gk < .5 && ((side === 1) === (lastG.team === 'home')) ? Math.sin(t * 60) * 5 * (1 - gk * 2) : 0;
+  const goalSvg = (u, side) => { const [x, y] = P(u, .5), d = netShake(side);
+    return `<g transform="translate(${(x + d).toFixed(1)},${y.toFixed(1)})"><rect x="${side > 0 ? 0 : -26}" y="-46" width="26" height="92" fill="#fff" opacity=".35"/>
+      <path d="M0,-46 L${side * 26},-46 L${side * 26},46 L0,46 M${side * 9},-46 V46 M${side * 18},-46 V46 M0,-15 H${side * 26} M0,15 H${side * 26}" stroke="#fff" stroke-width="2.5" fill="none"/></g>`; };
+  // игроки: по 5 на команду вокруг мяча; хозяева правее мяча в атаке вправо и наоборот
+  const r = rng(13), player = (u, w, kit, stripe, i) => {
+    const [x, y] = P(clamp(u, .02, .98), clamp(w, .04, .98)), s = .6 + .4 * clamp(w), run = Math.sin(t * 14 + i * 1.7);
+    return `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)}) scale(${s.toFixed(2)})">
+      <ellipse cx="0" cy="22" rx="12" ry="4" fill="#000" opacity=".25"/>
+      <path d="M-4,8 L${-6 - run * 5},22 M4,8 L${6 + run * 5},22" stroke="#222" stroke-width="5" stroke-linecap="round"/>
+      <rect x="-9" y="-14" width="18" height="24" rx="5" fill="${kit[0]}" stroke="#111" stroke-width="2.5"/>
+      ${stripe ? `<path d="M-3,-13 V9 M4,-13 V9" stroke="${kit[1]}" stroke-width="4"/>` : `<path d="M-9,-6 H9" stroke="${kit[1]}" stroke-width="3"/>`}
+      <circle cx="0" cy="-21" r="7" fill="#d9a77c" stroke="#111" stroke-width="2.5"/></g>`; };
+  const pl = [];
+  for (let i = 0; i < 5; i++) {
+    const a = i * 1.26 + .4, dist = .07 + r() * .12;
+    pl.push(player(bu - .04 + Math.cos(a) * dist + Math.sin(t * 1.3 + i) * .015, bw + Math.sin(a) * dist * 1.6, hk, false, i));
+    pl.push(player(bu + .04 + Math.cos(a + .6) * dist + Math.cos(t * 1.1 + i) * .015, bw + Math.sin(a + .6) * dist * 1.6, ak, true, i + 7));
+  }
+  const [bx, by] = P(bu, bw);
+  const ball = `<circle cx="${bx.toFixed(1)}" cy="${(by + 14).toFixed(1)}" r="8" fill="#fff" stroke="#111" stroke-width="2.5"/><path d="M${bx - 3},${by + 12} l3,-3 l3,3 l-1,4 h-4 Z" fill="#111"/>`;
+  const crowd = [...Array(120)].map((_, i) => { const x = X0 + (i * 37 % Wd), y = Y0 + 8 + (i * 13 % 50), hop = Math.max(0, Math.sin(t * 9 + i)) * (lastG && gk < 1 ? 6 : 1.5);
+    return `<circle cx="${x}" cy="${(y - hop).toFixed(1)}" r="4" fill="${['#f5f5f5', '#e9b52c', '#1d4fa3', '#a3203a', '#c96'][i % 5]}"/>`; }).join('');
+  const kitChip = (k, x, st) => `<rect x="${x}" y="356" width="16" height="22" fill="${k[0]}"/>${st ? `<rect x="${x + 6}" y="356" width="4" height="22" fill="${k[1]}"/>` : ''}`;
+  const board = `<g transform="translate(170,0)"><rect x="40" y="350" width="300" height="34" rx="4" fill="#0b0b0c" opacity=".9"/>${kitChip(hk, 48, false)}
+    <text x="72" y="374" font-family="Rubik" font-weight="800" font-size="20" fill="#fff">${V.home || 'RMA'} ${sh} - ${sa} ${V.away || 'FCB'}</text>${kitChip(ak, 218, true)}
+    <rect x="244" y="350" width="96" height="34" fill="#f6c445"/><text x="292" y="374" text-anchor="middle" font-family="Rubik" font-weight="800" font-size="20" fill="#111">${clock}</text></g>`;
+  let banner = '';
+  if (lastG && gk < 1) { const k = easeOutBack(prog(t, lastG.t, lastG.t + .25)), team = lastG.team === 'home' ? (V.home || 'RMA') : (V.away || 'FCB');
+    banner = `<g transform="translate(360,540) scale(${k.toFixed(3)}) rotate(-6)"><rect x="-230" y="-62" width="460" height="124" fill="#f6c445" stroke="#111" stroke-width="8"/>
+      <text x="0" y="22" text-anchor="middle" font-family="Rubik" font-weight="900" font-style="italic" font-size="84" fill="#111">GOAL!</text>
+      <rect x="-90" y="54" width="180" height="40" fill="#111"/><text x="0" y="83" text-anchor="middle" font-family="Rubik" font-weight="800" font-size="26" fill="#fff">${team} ${sh}-${sa}</text></g>`; }
+  if (V.final != null && t >= V.final) { const k = easeOutBack(prog(t, V.final, V.final + .25));
+    banner = `<g transform="translate(360,540) scale(${k.toFixed(3)})"><rect x="-210" y="-48" width="420" height="96" fill="#111" stroke="#f6c445" stroke-width="6"/>
+      <text x="0" y="18" text-anchor="middle" font-family="Rubik" font-weight="900" font-size="54" fill="#f6c445">FULL TIME</text></g>`; }
+  const flash = lastG && t < lastG.t + .18 ? `<rect x="${X0}" y="${Y0}" width="${Wd}" height="${Ht}" fill="#fff" opacity="${(1 - (t - lastG.t) / .18).toFixed(2)}"/>` : '';
+  return `<svg viewBox="0 0 720 1280" width="720" height="1280" xmlns="http://www.w3.org/2000/svg">
+    <rect width="720" height="1280" fill="#1a1512"/>
+    <rect width="720" height="1280" fill="#7cd67a" opacity=".03"/>
+    <ellipse cx="360" cy="540" rx="520" ry="380" fill="#7cd67a" opacity=".08"/>
+    <rect x="${X0 - 14}" y="${Y0 - 14}" width="${Wd + 28}" height="${Ht + 28}" rx="10" fill="#0c0c0d" stroke="${PL.ink}" stroke-width="6"/>
+    <clipPath id="tvClip"><rect x="${X0}" y="${Y0}" width="${Wd}" height="${Ht}"/></clipPath>
+    <g clip-path="url(#tvClip)">
+      <rect x="${X0}" y="${Y0}" width="${Wd}" height="${Ht}" fill="#2a2f3a"/>${crowd}
+      <rect x="${X0}" y="${Y0 + 62}" width="${Wd}" height="10" fill="#e9b52c"/>
+      ${stripes}${marks}${goalSvg(0, -1)}${goalSvg(1, 1)}${pl.join('')}${ball}${board}${banner}${flash}
+      ${[...Array(40)].map((_, i) => `<rect x="${X0}" y="${Y0 + i * 10}" width="${Wd}" height="2" fill="#000" opacity=".06"/>`).join('')}
+    </g>
+    <rect x="${X0 - 14}" y="${Y0 - 14}" width="${Wd + 28}" height="${Ht + 28}" rx="10" fill="none" stroke="#2a2a2d" stroke-width="4"/>
+    <path d="M200,${Y0 + Ht + 14} L520,${Y0 + Ht + 14} L560,${Y0 + Ht + 60} L160,${Y0 + Ht + 60} Z" fill="#0c0c0d"/>
+    <rect x="-20" y="${Y0 + Ht + 60}" width="760" height="40" fill="#3a2a1e" stroke="${PL.ink}" stroke-width="5"/>
+    ${plant(70, Y0 + Ht + 60, .9)}<rect x="560" y="${Y0 + Ht + 20}" width="70" height="40" rx="4" fill="#2a2a2d"/>
+  </svg>`;
+};
