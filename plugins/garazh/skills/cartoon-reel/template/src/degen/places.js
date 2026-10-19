@@ -264,7 +264,7 @@ function sofaFront(t, env) {
   const V = TIMELINE.tv || {}, X0 = 24, Y0 = 336, Wd = 672, Ht = 378;
   const hk = V.homeKit || ['#f5f5f5', '#e9b52c'], ak = V.awayKit || ['#1d4fa3', '#a3203a'];
   const goals = (V.goals || []).filter(g => t >= g.t), sh = goals.filter(g => g.team === 'home').length, sa = goals.length - sh;
-  const lastG = goals.length ? goals[goals.length - 1] : null, gk = lastG ? prog(t, lastG.t, lastG.t + 1.6) : 1;
+  const lastG = goals.length ? goals[goals.length - 1] : null, gk = lastG ? prog(t, lastG.t, lastG.t + (V.goalHold ?? 2.4)) : 1;   // баннер GOAL! висит goalHold с
   const sec = Math.floor(trackAt(V.clock || [{ t: 0, v: 72 * 60 + 18 }], t));
   const clock = sec >= 5400 ? `90+${Math.floor((sec - 5400) / 60) + 1}'` : `${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
   const [bu, bw] = trackAt(V.ball || [{ t: 0, v: [.5, .5] }], t);
