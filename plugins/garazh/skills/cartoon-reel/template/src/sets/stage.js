@@ -22,7 +22,8 @@ function stagePlacement(m) {
   // умолчания: shot.cast[i] → TIMELINE.cast[who].at → раскладка (TIMELINE.stage.preset: cast[who] | default) → (0,0,1)
   const LY = stageLayout(), d = { ...(LY.cast[m.who] || LY.default || {}), ...((TIMELINE.cast && TIMELINE.cast[m.who] && TIMELINE.cast[m.who].at) || {}) };
   const x = m.x ?? d.x ?? 0, y = m.y ?? d.y ?? 0, s = m.s ?? d.s ?? 1, flip = m.flip ?? d.flip ?? false, sx = flip ? -s : s;
-  return { x, y, s, sx, transform: `translate(${x},${y}) translate(360,1280) scale(${sx},${s}) translate(-360,-1280)`,
+  const rot = m.rot ?? d.rot ?? 0;   // (опц.) поворот всего персонажа вокруг ног, ° — «лежит в деньгах»
+  return { x, y, s, sx, transform: `translate(${x},${y})${rot ? ` rotate(${rot} 360 1280)` : ''} translate(360,1280) scale(${sx},${s}) translate(-360,-1280)`,
     toWorld: ([lx, ly]) => [x + 360 + sx * (lx - 360), y + 1280 + s * (ly - 1280)] };
 }
 // точка головы (локальная, до наклона) → мир: наклон tilt вокруг шеи (360,700), затем размещение
@@ -48,6 +49,15 @@ function stageDraw(t, shot) {
   });
   const env = stageEnv(t, members);
   const back = stageFn(shot.back ?? SG.back, 'back'), front = stageFn(shot.front ?? SG.front, 'front');
+  // танец (track dance 0..1): подпрыгивание в такт TIMELINE.bpm (128) + покачивание; нет трека — ровно как раньше
+  const bpm = TIMELINE.bpm || 128;
+  for (const mm of members) {
+    const dn = mm.st.dance || 0;
+    if (dn) {
+      const ph = t * bpm / 60 * Math.PI + (mm.st.who === mm.m.who ? charPhase(mm.m.who) * .8 : 0);
+      mm.pl = { ...mm.pl, transform: `translate(0,${(-Math.abs(Math.sin(ph)) * 26 * dn).toFixed(1)}) rotate(${(Math.sin(ph / 2) * 4 * dn).toFixed(2)} ${360 + mm.pl.x} 1280) ` + mm.pl.transform };
+    }
+  }
   const behind = members.map(({ ch, st, pl, P }) =>
     `<g transform="${pl.transform}">${ch.body(st, P)}${armsSvg(st.arms, 'behind', st, t, env)}<g transform="rotate(${(st.tilt || 0).toFixed(2)} 360 700)">${ch.head(st, P)}</g></g>`).join('');
   const fore = members.map(({ st, pl }) => { const a = armsSvg(st.arms, 'front', st, t, env); return a ? `<g transform="${pl.transform}">${a}</g>` : ''; }).join('');

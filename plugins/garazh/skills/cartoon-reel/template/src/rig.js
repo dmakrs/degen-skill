@@ -23,7 +23,7 @@ const RIG_DEFAULTS = { sleeve: SUIT, stripe: '#f4f4f0', crease: CREASE, width: 5
 function rigOf(rig) {
   const r = rig || {};
   return { L: r.L || RIG.L, R: r.R || RIG.R, dur: r.dur ?? RIG.dur, sleeve: r.sleeve ?? RIG_DEFAULTS.sleeve,
-    stripe: 'stripe' in r ? r.stripe : RIG_DEFAULTS.stripe, skin: r.skin ?? SKIN, crease: r.crease ?? RIG_DEFAULTS.crease, width: r.width ?? RIG_DEFAULTS.width };
+    stripe: 'stripe' in r ? r.stripe : RIG_DEFAULTS.stripe, skin: r.skin ?? SKIN, crease: r.crease ?? RIG_DEFAULTS.crease, width: r.width ?? RIG_DEFAULTS.width, band: r.band ?? null };
 }
 
 // ── математика ──
@@ -191,6 +191,16 @@ function sleeveSvg(a) {
   const cut = (p, q, d) => { const L = Math.hypot(q[0] - p[0], q[1] - p[1]) || 1; return [p[0] + (q[0] - p[0]) * d / L, p[1] + (q[1] - p[1]) * d / L]; };
   const s1 = cut(s, e, 12), w1 = cut(w, e, 16);
   const stripe = `M${s1[0].toFixed(1)},${s1[1].toFixed(1)} L${e[0].toFixed(1)},${e[1].toFixed(1)} L${w1[0].toFixed(1)},${w1[1].toFixed(1)}`;
+  // band (опц., rig.band = { color, text, w }): широкая лента по рукаву с повторяющимися буквами (DOXA: «DDDD» на золотом канте)
+  if (R.band) {
+    const B = R.band, bw = B.w ?? 30, id = `band_${a.side}_${Math.round(s[0])}_${Math.round(s[1])}_${Math.round(w[0])}_${Math.round(w[1])}`;
+    const lr = w[0] < s[0];   // текст читается слева направо: путь ведём от левого конца
+    const tp = lr ? `M${w1[0].toFixed(1)},${w1[1].toFixed(1)} L${e[0].toFixed(1)},${e[1].toFixed(1)} L${s1[0].toFixed(1)},${s1[1].toFixed(1)}` : stripe;
+    return tube([s, e, w].map(p => [+p[0].toFixed(1), +p[1].toFixed(1)]), R.width, R.sleeve) +
+      `<path d="${stripe}" stroke="${B.color}" stroke-width="${bw}" fill="none" stroke-linejoin="round"/>
+       <path id="${id}" d="${tp}" stroke="${R.sleeve}" stroke-width="${bw - 8}" fill="none" stroke-linejoin="round"/>
+       <text font-family="Rubik" font-weight="900" font-size="${bw - 10}" fill="${B.color}" dy="${(bw - 10) * .36}"><textPath href="#${id}">${(B.text || 'D').repeat(40)}</textPath></text>`;
+  }
   return tube([s, e, w].map(p => [+p[0].toFixed(1), +p[1].toFixed(1)]), R.width, R.sleeve) +
     (R.stripe ? `<path d="${stripe}" stroke="${R.stripe}" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
      <path d="${stripe}" stroke="${R.sleeve}" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>` : '');

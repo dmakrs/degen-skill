@@ -106,13 +106,14 @@ window.render = function (t) {
   const E = TIMELINE.events || {};
   let amp = 0;
   if (E.boom != null && t >= E.boom && t < E.boom + .35) amp = 14 * (1 - (t - E.boom) / .35);
+  for (const [bt, a, d = .35] of E.shakes || []) if (t >= bt && t < bt + d) amp = Math.max(amp, a * (1 - (t - bt) / d));   // доп. удары [t, px, dur?]
   if (shot.shakeIn && t < shot.from + .25) amp = shot.shakeIn * (1 - (t - shot.from) / .25);   // тряска на входе в кадр
   const sh = shake(t, amp);
   const svg = draw(t, shot, charState(t, shot));
   const cam = document.getElementById('cam');
   cam.innerHTML = svg;
   cam.style.transform = `translate(${360 - c.x * c.s + sh.x}px, ${640 - c.y * c.s + sh.y}px) scale(${c.s})`;
-  document.getElementById('ui').innerHTML = badges(t) + subtitle(t);
+  document.getElementById('ui').innerHTML = badges(t) + subtitle(t) + (TIMELINE.pnl ? pnl(t) : '');
   const fi = Math.round(t * 30);
   document.querySelectorAll('.grain').forEach((g, i) => g.style.display = i === fi % 6 ? 'block' : 'none');
   document.getElementById('flicker').style.opacity = (0.05 + 0.04 * Math.sin(fi * 2.7) * Math.sin(fi * 1.3)).toFixed(3);

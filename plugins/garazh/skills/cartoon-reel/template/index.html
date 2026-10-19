@@ -20,6 +20,16 @@
   .badge { position: absolute; transform-origin: 30% 100%; background: #fbf6ea; border: 5px solid #2a1c14; border-radius: 12px;
            padding: 12px 18px 14px; box-shadow: 6px 7px 0 rgba(20,12,6,.55); text-align: center; }
   .badge .name { font: 400 60px/1 Pangolin, sans-serif; color: #2a1c14; letter-spacing: 2px; -webkit-text-stroke: 2.2px #2a1c14; }
+  /* look 'degen' (TIMELINE.look): чистый яркий кадр без тёплой плёнки и виньетки, крупный PnL-счётчик сверху */
+  #stage.degen #warm, #stage.degen #haze, #stage.degen #vignette, #stage.degen #flicker { display: none; }
+  #stage.degen .grain { opacity: .05; }
+  .pnl { position: absolute; left: 50%; white-space: nowrap; transform-origin: 50% 50%; font: 900 84px/1 Rubik, sans-serif; letter-spacing: -1px;
+         -webkit-text-stroke: 14px #0b0b0b; paint-order: stroke fill; text-shadow: 0 7px 0 #0b0b0b; }
+  .pnl.up { color: #45f24a; } .pnl.down { color: #ff2b2b; }
+  #stage.degen .badge { background: #0b0b0c; border-color: #f6c445; box-shadow: 6px 7px 0 rgba(0,0,0,.6); }
+  #stage.degen .badge .name { color: #f6c445; -webkit-text-stroke-color: #f6c445; }
+  #stage.degen .badge .role { border-color: #f6c445; color: #0b0b0c; }
+  #stage.degen .sub { top: 1168px; background: #0b0b0c; border: 3px solid #f6c445; }
   .badge .role { margin-top: 10px; display: inline-block; padding: 6px 14px; border: 3px solid #2a1c14; border-radius: 6px;
                  font: 700 19px/1 'JetBrains Mono', monospace; color: #2a1c14; letter-spacing: 1px; }
 </style></head>
@@ -53,6 +63,9 @@
 </script>
 <script>
   // файлы, объявленные эпизодом (пути от корня проекта), например новые сеты/персонажи в episodes/<ep>/
+  // look 'degen': общая библиотека крипто-стиля (персонажи Дак и Лёха, терминал, локации) — грузится только для таких эпизодов
+  if (typeof TIMELINE === 'object' && TIMELINE.look === 'degen')
+    ['src/degen/chars.js', 'src/degen/terminal.js', 'src/degen/market.js', 'src/degen/places.js'].forEach(s => document.write(`<script src="${s}"><\/script>`));
   (typeof TIMELINE === 'object' && TIMELINE.scripts || []).forEach(s => document.write(`<script src="${s}"><\/script>`));
 </script>
 <script src="src/presets.js"></script>
@@ -73,6 +86,7 @@
       ctx.putImageData(img, 0, 0); host.appendChild(c);
     }
   })();
+  if (typeof TIMELINE === 'object' && TIMELINE.look) document.getElementById('stage').classList.add(TIMELINE.look);
   const q = new URLSearchParams(location.search);
   render(parseFloat(q.get('t') || '0'));
 </script>

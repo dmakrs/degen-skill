@@ -1,3 +1,26 @@
+# degen-skill — DOXA owl reels (fork of garazh-skill)
+
+Fork of [lubluniky/garazh-skill](https://github.com/lubluniky/garazh-skill) with a second style: **`degen` / DOXA** — vertical reels about prediction markets starring the DOXA owl, cut like viral crypto-degen reels (hard cuts, a giant green/red PnL counter, the terminal full-screen, pump → «money montage» → deadpan punch).
+
+![Contact sheet of the example episode «YES at 12¢»](docs/doxa-preview.jpg)
+
+*Example episode `doxa`, 23 s: the owl buys YES on «Bitcoin to $200k by 2026?» at 12¢, the market dumps to 4% (shades slide down), then pumps to 99% — RESOLVED YES — club, yacht, rooftop, the moon, +$10,000,000… back to reality: +$73,300. «One more market.» He buys NO on «Will Owl quit trading in 2026?».*
+
+```
+/plugin marketplace add dmakrs/degen-skill
+/plugin install garazh@garazh-skill
+```
+Then: «Сделай рилс DOXA про сову, которая купила YES на выборах…». The skill `doxa-reel` drives it; style guide and API — `plugins/garazh/skills/cartoon-reel/references/degen.md`.
+
+What the fork adds (old episodes render byte-identical):
+- `TIMELINE.look: 'degen'` — clean bright look, black/yellow badges & subs, PnL overlay (`TIMELINE.pnl`), camera hits (`events.shakes`)
+- `src/degen/chars.js` — the DOXA owl (`CHARS.owl`): pixel shades (slide down on shock), «D» sleeve band (new rig option `band`), grin/sweat/puff/dance tracks
+- `src/degen/market.js` — prediction-market terminal: market card, probability chart, Yes/No in ¢, amount slider, Buy, position PnL, RESOLVED stamp, cursor
+- `src/degen/terminal.js` — candle terminal with leverage panel; `src/degen/places.js` — cozy night room, yacht at sunset, club, rooftop, moon, money piles + rain, paw-on-mouse close-up
+- sfx recipes: `kickLoop hatLoop clapLoop bassLoop cash riser alarm`
+
+---
+
 # garazh — cartoon reels from your own story, with Claude Code
 
 A Claude Code skill + a small rendering engine that turns a one-line idea into a **vertical cartoon reel** (720×1280, 30 fps, 8–90 s) in a deadpan «garage IT-startup» style: flat 2D with thick brown outlines, warm film grain, karaoke subtitles, name badges with joke job titles, a Claude chat on a laptop screen, procedural foley and optional TTS voice-over.

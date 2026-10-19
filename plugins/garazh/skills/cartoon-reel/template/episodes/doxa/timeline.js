@@ -1,0 +1,107 @@
+// «YES за 12 центов» — эпизод-эталон стиля DOXA: сова, prediction market, памп, монтаж богатства, панч.
+// Стиль монтажа — как у вирусных крипто-рилсов: жёсткие склейки 1–2 с, огромный PnL сверху, терминал крупно.
+const TIMELINE = {
+  duration: 23.0,
+  look: 'degen',
+  bpm: 128,
+  stage: { back: 'roomBack', front: 'roomFront', cast: { owl: { x: 40, y: 0, s: 1 } } },
+  shots: [
+    { id: 'room',    set: 'stage', from: 0,    to: 2.0,  cast: ['owl'], cam: [[0, 330, 660, 1.0], [2.0, 330, 650, 1.06]] },
+    { id: 'paw',     set: 'paw',   from: 2.0,  to: 3.0,  cam: [[2.0, 360, 640, 1.0], [3.0, 360, 650, 1.06]] },
+    { id: 'buy',     set: 'market', market: 'btc', from: 3.0, to: 7.0,  cam: [[3.0, 360, 640, 1.0], [7.0, 360, 640, 1.03]] },
+    { id: 'shock',   set: 'stage', from: 7.0,  to: 8.4,  cast: ['owl'], shakeIn: 8, cam: { preset: 'cu:owl', s: 1.9 } },
+    { id: 'pump',    set: 'market', market: 'btc', from: 8.4, to: 11.0, cam: [[8.4, 360, 640, 1.0], [11.0, 360, 620, 1.05]] },
+    { id: 'club',    set: 'stage', from: 11.0, to: 13.0, cast: [{ who: 'owl', x: 0 }], back: 'clubBack', front: 'moneyFront', cam: [[11.0, 360, 660, 1.0], [13.0, 360, 650, 1.05]] },
+    { id: 'yacht',   set: 'stage', from: 13.0, to: 15.0, cast: [{ who: 'owl', x: 120 }], back: 'yachtBack', front: 'moneyFront', cam: [[13.0, 420, 660, 1.0], [15.0, 420, 650, 1.05]] },
+    { id: 'roof',    set: 'stage', from: 15.0, to: 17.0, cast: [{ who: 'owl', x: 0 }], back: 'roofBack', front: 'moneyFront', cam: [[15.0, 360, 660, 1.0], [17.0, 360, 650, 1.05]] },
+    { id: 'moon',    set: 'stage', from: 17.0, to: 19.2, cast: [{ who: 'owl', x: 0 }], back: 'moonBack', front: 'moneyFront', cam: [[17.0, 360, 660, 1.0], [19.2, 360, 645, 1.07]] },
+    { id: 'reality', set: 'stage', from: 19.2, to: 20.6, cast: ['owl'], cam: { preset: 'mid:owl', s: 1.3 } },
+    { id: 'quit',    set: 'market', market: 'quit', from: 20.6, to: 23.0, cam: [[20.6, 360, 640, 1.0], [23.0, 360, 640, 1.04]] },
+  ],
+  pnl: {
+    show: [[0, 2.0], [7.0, 8.4], [11.0, 20.6]],
+    keys: [
+      { t: 0, v: -9999 },
+      { t: 7.0, v: -16699 },
+      { t: 11.0, v: 73300 },
+      { t: 13.0, v: 499999 },
+      { t: 15.0, v: 5000000 },
+      { t: 17.0, v: 10000000 },
+      { t: 19.2, v: 73300 },
+    ],
+  },
+  badges: [{ from: 0.35, to: 2.0, name: 'OWL', role: 'CEO · ORACLE · DEGEN', color: '#f6c445', x: 24, y: 210, rot: -4 }],
+  subs: [
+    { from: 19.45, to: 20.6, words: [['One', 19.45], ['more', 19.65], ['market.', 19.9]] },
+    { from: 22.3, to: 23.0, words: [['Obviously.', 22.3]] },
+  ],
+  talk: [[19.45, 20.25, 'owl']],
+  events: {
+    clicks: [2.55],
+    shakes: [[9.6, 16, .45], [10.4, 10, .3], [11.0, 12, .3]],
+  },
+  env: {
+    glow: [{ t: 0, v: 'yellow' }, { t: 7.0, v: 'red' }, { t: 19.2, v: 'green' }],
+    flash: [{ t: 0, v: 0 }, { t: 11.0, v: 1 }],
+  },
+  cast: {
+    owl: {
+      poses: {
+        L: [
+          { t: 0, pose: 'rest' },
+          { t: 7.0, pose: 'down' },
+          { t: 11.0, pose: 'point', at: 'up' }, { t: 11.47, pose: 'spread' }, { t: 11.94, pose: 'point', at: 'up' }, { t: 12.41, pose: 'spread' },
+          { t: 13.0, pose: 'thumbsUp' },
+          { t: 15.0, pose: 'fingerUp' }, { t: 15.94, pose: 'point', at: 'up' },
+          { t: 17.0, pose: 'spread' }, { t: 17.94, pose: 'point', at: 'up' },
+          { t: 19.2, pose: 'rest' }, { t: 19.45, pose: 'fingerUp' },
+        ],
+        R: [
+          { t: 0, pose: 'typing' },
+          { t: 7.0, pose: 'down' },
+          { t: 11.0, pose: 'spread' }, { t: 11.47, pose: 'point', at: 'up' }, { t: 11.94, pose: 'spread' }, { t: 12.41, pose: 'point', at: 'up' },
+          { t: 13.0, pose: 'thumbsUp' },
+          { t: 15.0, pose: 'spread' }, { t: 15.94, pose: 'spread' },
+          { t: 17.0, pose: 'point', at: 'up' }, { t: 17.94, pose: 'spread' },
+          { t: 19.2, pose: 'typing' },
+        ],
+        head: [
+          { t: 0, tilt: 0 }, { t: 0.4, tilt: -4 }, { t: 7.0, tilt: 0 }, { t: 7.3, tilt: 5 },
+          { t: 11.0, tilt: -6 }, { t: 13.0, tilt: 4 }, { t: 15.0, tilt: -5 }, { t: 17.0, tilt: 6 },
+          { t: 19.2, tilt: 0 }, { t: 19.45, tilt: -5 }, { t: 20.0, pose: 'nod' },
+        ],
+      },
+      tracks: {
+        grin: [{ t: 0, v: 0 }, { t: 11.0, v: .6 }, { t: 17.0, v: 1 }, { t: 19.2, v: .4 }],
+        dance: [{ t: 0, v: 0 }, { t: 11.0, v: 1 }, { t: 13.0, v: .35 }, { t: 15.0, v: .7 }, { t: 17.0, v: .5 }, { t: 19.2, v: 0 }],
+        lid: [{ t: 0, v: .6 }],
+      },
+      events: { shock: [[7.05, 8.35]], blink: [1.4, 19.0] },
+    },
+  },
+  markets: {
+    btc: {
+      cat: 'Crypto', title: 'Bitcoin to $200k by 2026?', ends: "Dec 31, '26", icon: '₿', vol: '$72.4M',
+      chart: { seed: 3, n: 40, path: [34, 26, 29, 20, 16, 12] },
+      prob: [{ t: 0, v: 12 }, { t: 6.2, v: 9, dur: .8 }, { t: 8.5, v: 4, dur: .7 }, { t: 9.6, v: 97, dur: .5 }, { t: 10.2, v: 99, dur: .2 }],
+      select: [{ t: 0, v: '' }, { t: 3.55, v: 'yes' }],
+      amount: [{ t: 0, v: 0 }, { t: 4.1, v: 1, dur: .9 }],
+      press: [5.8],
+      pos: { show: [[6.0, 11.0]], entry: '12¢', pnl: [{ t: 0, v: 0 }, { t: 6.2, v: -2500, dur: .8 }, { t: 8.5, v: -6700, dur: .7 }, { t: 9.6, v: 70800, dur: .5 }, { t: 10.2, v: 73300, dur: .2 }] },
+      resolve: { t: 10.4, outcome: 'YES' },
+      cursor: [{ t: 0, v: [620, 1180] }, { t: 3.15, v: [200, 826], dur: .35 }, { t: 3.85, v: [110, 936], dur: .2 }, { t: 4.1, v: [610, 936], dur: .9 },
+               { t: 5.25, v: [360, 1018], dur: .4 }, { t: 6.3, v: [640, 1190], dur: .5 }],
+      clicks: [3.55, 5.8],
+    },
+    quit: {
+      cat: 'All', title: 'Will Owl quit trading in 2026?', ends: "Dec 31, '26", icon: 'D', vol: '$4.2M',
+      chart: { seed: 8, n: 40, path: [9, 6, 4, 2, 1] },
+      prob: [{ t: 0, v: 1 }],
+      select: [{ t: 0, v: '' }, { t: 21.45, v: 'no' }],
+      amount: [{ t: 0, v: 0 }, { t: 21.6, v: 1, dur: .3 }],
+      press: [22.2],
+      cursor: [{ t: 0, v: [640, 1190] }, { t: 20.8, v: [520, 826], dur: .4 }, { t: 21.8, v: [360, 1018], dur: .3 }],
+      clicks: [21.45, 22.2],
+    },
+  },
+};

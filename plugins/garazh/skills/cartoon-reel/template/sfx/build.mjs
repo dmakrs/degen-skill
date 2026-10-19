@@ -129,6 +129,32 @@ const RECIPES = {
     return { dur, graph: `${src(`round(${wave}*${env}*7)/7`, dur)},highpass=f=250,lowpass=f=7500[m]` };
   },
 
+  // ── degen / DOXA: музыка и деньги. Лупы синтезируются целиком на длину c.len (с), такт — c.bpm (128)
+  // kickLoop: бочка на каждую долю (pitch-drop синус, мягкий клип)
+  kickLoop: c => { const B = 60 / (c.bpm ?? 128), tt = `mod(t,${B.toFixed(5)})`;
+    return { dur: c.len, graph: `${src(`min(1,${tt}/0.001)*exp(-${tt}*8)*sin(2*PI*(46*${tt}+(170-46)*0.035*(1-exp(-${tt}/0.035))))`, c.len)},asoftclip=type=tanh[m]` }; },
+  // hatLoop: хэт на офбит + тихие 16-е
+  hatLoop: c => { const B = 60 / (c.bpm ?? 128), q = B / 4, tt = `mod(t,${q.toFixed(5)})`, n = `floor(t/${q.toFixed(5)})`;
+    return { dur: c.len, graph: `${src(`${N0}*exp(-${tt}*70)*(0.25+0.75*eq(mod(${n},4),2))`, c.len)},highpass=f=7000[m]` }; },
+  // clapLoop: хлопок на 2 и 4
+  clapLoop: c => { const B = 60 / (c.bpm ?? 128), tt = `mod(t+${B.toFixed(5)},${(2 * B).toFixed(5)})`;
+    return { dur: c.len, graph: `${src(`${N0}*(exp(-${tt}*30)+0.6*gt(${tt},0.012)*exp(-(${tt}-0.012)*40))`, c.len)},bandpass=f=1400:width_type=h:w=1600[m]` }; },
+  // bassLoop: 808-бас по нотам c.notes (полутоны от c.root, одна нота на долю, по кругу)
+  bassLoop: c => { const B = 60 / (c.bpm ?? 128), notes = c.notes || [0, 0, 3, 5], tt = `mod(t,${B.toFixed(5)})`, i = `mod(floor(t/${B.toFixed(5)}),${notes.length})`;
+    const st = notes.map((s, k) => `eq(${i},${k})*${s}`).join('+'), f = `${c.root ?? 55}*pow(2,(${st})/12)`;
+    return { dur: c.len, graph: `${src(`min(1,${tt}/0.004)*exp(-${tt}*2.2)*sin(2*PI*${f}*${tt})`, c.len)},asoftclip=type=tanh,lowpass=f=400[m]` }; },
+  // cash: «ка-чинг» — щелчок кассы + два металлических пинга
+  cash: () => ({ dur: 0.7, graph: [
+    `${src(`${N0}*exp(-t*90)`, 0.7)},bandpass=f=3000:width_type=h:w=2500[cl]`,
+    `${src(`${at(0.05, tt => `${ping(2093, 7, tt)}+${ping(5274, 11, tt, .5)}+${ping(3136, 9, tt, .4)}`)}+${at(0.16, tt => `${ping(2637, 6, tt)}+${ping(6645, 10, tt, .4)}`)}`, 0.7)}[pg]`,
+    `[cl][pg]amix=inputs=2:weights=0.6 1:normalize=0[m]`].join(';') }),
+  // riser: шум с растущим тоном и громкостью, align:'end' — приземляется на удар
+  riser: c => ({ dur: c.dur ?? 1.2, graph:
+    `${src(`pow(t/${c.dur ?? 1.2},2)*(0.6*${N0}+0.5*sin(${sweepPhase(200, 1600, c.dur ?? 1.2, 't')}))`, c.dur ?? 1.2)},highpass=f=300[m]` }),
+  // alarm: тревожный двухтон (слив, шок)
+  alarm: () => ({ dur: 0.9, graph:
+    `${src(`(gt(sin(2*PI*(880-220*gt(mod(t,0.3),0.15))*t),0)*2-1)*0.5*${sw('t/0.9')}`, 0.9)},lowpass=f=3000[m]` }),
+
   // slide-whistle up, "shock" sting
   slideWhistle: () => ({ dur: 0.2, graph:
     `${src(`min(1,t/0.006)*(sin(${sweepPhase(850, 2900, 0.15, 't')}+0.5*sin(2*PI*26*t))+0.15*sin(3*${sweepPhase(850, 2900, 0.15, 't')}))`, 0.2)}[m]` }),
